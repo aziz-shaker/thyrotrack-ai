@@ -1,0 +1,506 @@
+// ThyroTrack AI — data model
+// Flow: Patient -> UltrasoundStudy -> UltrasoundImage -> AIAnalysis -> NoduleFinding -> DoctorReview -> Report
+// Medical records use soft delete (deletedAt). All IDs are UUIDs.
+
+generator client {
+  provider      = "prisma-client-js"
+  // native = local dev; rhel-openssl-3.0.x = Vercel/AWS Lambda; linux-arm64/debian = Docker on ARM servers
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RADIOLOGIST
+  LAB_TECH
+  PATIENT
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum StudyStatus {
+  UPLOADED
+  ANALYZING
+  ANALYZED
+  REVIEWED
+  REPORTED
+  FAILED
+}
+
+enum ImageView {
+  TRANSVERSE
+  SAGITTAL
+  UNKNOWN
+}
+
+enum Lobe {
+  RIGHT
+  LEFT
+  ISTHMUS
+}
+
+enum LobeZone {
+  UPPER
+  MIDDLE
+  LOWER
+}
+
+enum Composition {
+  CYSTIC          // 0 pts
+  SPONGIFORM      // 0
+  MIXED           // 1
+  SOLID           // 2
+}
+
+enum Echogenicity {
+  ANECHOIC        // 0
+  HYPERECHOIC     // 1
+  ISOECHOIC       // 1
+  HYPOECHOIC      // 2
+  VERY_HYPOECHOIC // 3
+}
+
+enum Shape {
+  WIDER_THAN_TALL // 0
+  TALLER_THAN_WIDE // 3
+}
+
+enum Margin {
+  SMOOTH          // 0
+  ILL_DEFINED     // 0
+  LOBULATED       // 2
+  EXTRATHYROIDAL  // 3
+}
+
+enum EchogenicFoci {
+  NONE            // 0
+  COMET_TAIL      // 0
+  MACRO           // 1
+  RIM             // 2
+  PUNCTATE        // 3
+}
+
+enum RiskCategory {
+  BENIGN
+  LOW
+  MODERATE
+  HIGH
+  SUSPICIOUS
+}
+
+enum ReviewDecision {
+  CONFIRMED
+  MODIFIED
+  REJECTED
+}
+
+enum Recommendation {
+  ROUTINE_FOLLOW_UP
+  US_FOLLOW_UP
+  FNA
+  ADDITIONAL_IMAGING
+  LAB_TESTS
+  SURGICAL_REFERRAL
+  NO_ACTION
+}
+
+enum ReportStatus {
+  DRAFT
+  APPROVED
+  SENT
+}
+
+enum FollowUpStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+enum LabType {
+  TSH
+  FT3
+  FT4
+  ANTI_TPO
+  THYROGLOBULIN
+  CALCITONIN
+  FNA_CYTOLOGY
+}
+
+enum NotificationType {
+  HIGH_RISK
+  GROWTH_ALERT
+  ANALYSIS_DONE
+  REPORT_READY
+  FOLLOW_UP
+  MESSAGE
+}
+
+// ---------- Users & access ----------
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         Role
+  locale       String    @default("ar")
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  doctor        DoctorProfile?
+  patient       Patient?
+  reviews       DoctorReview[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+  sentMessages  Message[]      @relation("sender")
+  inbox         Message[]      @relation("recipient")
+  labResults    LabResult[]    @relation("enteredBy")
+}
+
+model DoctorProfile {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @unique @db.Uuid
+  specialty     String   // Endocrinology, Radiology...
+  licenseNumber String
+  title         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User                @relation(fields: [userId], references: [id])
+  assignments PatientAssignment[]
+  studies     UltrasoundStudy[]   @relation("orderedBy")
+  followUps   FollowUp[]
+}
+
+/// Doctor <-> Patient access. expiresAt != null means temporary (consult / break-glass) access.
+model PatientAssignment {
+  id        String    @id @default(uuid()) @db.Uuid
+  doctorId  String    @db.Uuid
+  patientId String    @db.Uuid
+  isPrimary Boolean   @default(false)
+  reason    String?
+  expiresAt DateTime?
+  grantedBy String?   @db.Uuid
+  createdAt DateTime  @default(now())
+
+  doctor  DoctorProfile @relation(fields: [doctorId], references: [id])
+  patient Patient       @relation(fields: [patientId], references: [id])
+
+  @@unique([doctorId, patientId])
+}
+
+// ---------- Patient ----------
+
+model Patient {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String?   @unique @db.Uuid
+  mrn            String    @unique // medical record number
+  fullName       String
+  dateOfBirth    DateTime  @db.Date
+  sex            Sex
+  phoneEnc       String?   // AES-256-GCM encrypted
+  email          String?
+  medicalHistory String?
+  familyHistory  String?
+  medications    String?
+  allergies      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  user        User?               @relation(fields: [userId], references: [id])
+  assignments PatientAssignment[]
+  studies     UltrasoundStudy[]
+  nodules     Nodule[]
+  labResults  LabResult[]
+  followUps   FollowUp[]
+  records     MedicalRecord[]
+  reports     Report[]
+
+  @@index([fullName])
+}
+
+/// Generic uploaded file (PDF, lab scan, external report)
+model MedicalRecord {
+  id          String    @id @default(uuid()) @db.Uuid
+  patientId   String    @db.Uuid
+  title       String
+  storageKey  String
+  mimeType    String
+  sizeBytes   Int
+  uploadedBy  String    @db.Uuid
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+// ---------- Imaging ----------
+
+model UltrasoundStudy {
+  id          String      @id @default(uuid()) @db.Uuid
+  patientId   String      @db.Uuid
+  orderedById String?     @db.Uuid
+  accession   String      @unique
+  studyDate   DateTime
+  device      String?
+  indication  String?
+  status      StudyStatus @default(UPLOADED)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  patient   Patient            @relation(fields: [patientId], references: [id])
+  orderedBy DoctorProfile?     @relation("orderedBy", fields: [orderedById], references: [id])
+  images    UltrasoundImage[]
+  analyses  AIAnalysisResult[]
+  reports   Report[]
+
+  @@index([patientId, studyDate])
+}
+
+model UltrasoundImage {
+  id            String    @id @default(uuid()) @db.Uuid
+  studyId       String    @db.Uuid
+  storageKey    String
+  mimeType      String
+  width         Int?
+  height        Int?
+  /// mm per pixel — from DICOM PixelSpacing or manual calibration (needed for real measurements)
+  pixelSpacingMm Float?
+  view          ImageView @default(UNKNOWN)
+  isDicom       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  deletedAt     DateTime?
+
+  study    UltrasoundStudy @relation(fields: [studyId], references: [id])
+  findings NoduleFinding[]
+}
+
+/// Persistent nodule identity per patient, so the same nodule can be tracked across studies.
+model Nodule {
+  id        String   @id @default(uuid()) @db.Uuid
+  patientId String   @db.Uuid
+  label     String   // N1, N2...
+  lobe      Lobe
+  zone      LobeZone
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient  Patient         @relation(fields: [patientId], references: [id])
+  findings NoduleFinding[]
+
+  @@unique([patientId, label])
+}
+
+// ---------- AI ----------
+
+model AIAnalysisResult {
+  id           String   @id @default(uuid()) @db.Uuid
+  studyId      String   @db.Uuid
+  modelVersion String   // e.g. "mock-detector@1.0 + tirads-rules@2017"
+  imageQuality Float?   // 0..1
+  warnings     String[]
+  rawOutput    Json     // immutable original AI response (audit)
+  durationMs   Int?
+  createdAt    DateTime @default(now())
+
+  study    UltrasoundStudy @relation(fields: [studyId], references: [id])
+  findings NoduleFinding[]
+  review   DoctorReview?
+}
+
+/// One detected nodule in one analysis (includes segmentation + TI-RADS features)
+model NoduleFinding {
+  id         String  @id @default(uuid()) @db.Uuid
+  analysisId String  @db.Uuid
+  noduleId   String? @db.Uuid
+  imageId    String? @db.Uuid
+
+  // Location
+  lobe          Lobe
+  zone          LobeZone
+  nearCapsule   Boolean @default(false)
+
+  // Segmentation (normalized 0..1 coords)
+  bbox     Json  // {x,y,w,h}
+  contour  Json  // [[x,y], ...] polygon
+
+  // Measurements (mm / ml)
+  lengthMm Float
+  widthMm  Float
+  depthMm  Float
+  volumeMl Float
+
+  // ACR TI-RADS features
+  composition   Composition
+  echogenicity  Echogenicity
+  shape         Shape
+  margin        Margin
+  echogenicFoci EchogenicFoci[]
+  tiradsPoints  Int
+  tiradsLevel   Int // 1..5
+
+  risk            RiskCategory
+  malignancyProb  Float // 0..1
+  confidence      Float // 0..1
+  explanation     Json  // per-feature reasoning
+
+  createdAt DateTime @default(now())
+
+  analysis AIAnalysisResult @relation(fields: [analysisId], references: [id])
+  nodule   Nodule?          @relation(fields: [noduleId], references: [id])
+  image    UltrasoundImage? @relation(fields: [imageId], references: [id])
+}
+
+// ---------- Review & reports ----------
+
+model DoctorReview {
+  id              String         @id @default(uuid()) @db.Uuid
+  analysisId      String         @unique @db.Uuid
+  reviewerId      String         @db.Uuid
+  decision        ReviewDecision
+  finalTirads     Int?
+  finalRisk       RiskCategory?
+  recommendation  Recommendation
+  clinicalNotes   String?
+  changeReason    String?
+  /// doctor-edited findings (the AI original stays untouched in AIAnalysisResult)
+  modifiedFindings Json?
+  signedAt        DateTime?
+  signatureHash   String?        // SHA-256 of signed content (tamper evidence)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  analysis AIAnalysisResult @relation(fields: [analysisId], references: [id])
+  reviewer User             @relation(fields: [reviewerId], references: [id])
+  report   Report?
+}
+
+model Report {
+  id             String       @id @default(uuid()) @db.Uuid
+  patientId      String       @db.Uuid
+  studyId        String       @db.Uuid
+  reviewId       String       @unique @db.Uuid
+  status         ReportStatus @default(DRAFT)
+  pdfKey         String?
+  shareToken     String?      @unique
+  shareExpiresAt DateTime?
+  sentAt         DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+
+  patient Patient         @relation(fields: [patientId], references: [id])
+  study   UltrasoundStudy @relation(fields: [studyId], references: [id])
+  review  DoctorReview    @relation(fields: [reviewId], references: [id])
+}
+
+// ---------- Labs & follow-up ----------
+
+model LabResult {
+  id          String    @id @default(uuid()) @db.Uuid
+  patientId   String    @db.Uuid
+  enteredById String?   @db.Uuid
+  type        LabType
+  value       Float?
+  unit        String?
+  refLow      Float?
+  refHigh     Float?
+  /// FNA cytology: Bethesda category I..VI
+  bethesda    Int?
+  notes       String?
+  takenAt     DateTime
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  patient   Patient @relation(fields: [patientId], references: [id])
+  enteredBy User?   @relation("enteredBy", fields: [enteredById], references: [id])
+
+  @@index([patientId, type, takenAt])
+}
+
+model FollowUp {
+  id          String         @id @default(uuid()) @db.Uuid
+  patientId   String         @db.Uuid
+  doctorId    String?        @db.Uuid
+  scheduledAt DateTime
+  reason      String
+  status      FollowUpStatus @default(SCHEDULED)
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  patient Patient        @relation(fields: [patientId], references: [id])
+  doctor  DoctorProfile? @relation(fields: [doctorId], references: [id])
+
+  @@index([scheduledAt])
+}
+
+// ---------- Communication & audit ----------
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, readAt])
+}
+
+model Message {
+  id          String    @id @default(uuid()) @db.Uuid
+  senderId    String    @db.Uuid
+  recipientId String    @db.Uuid
+  body        String
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  sender    User @relation("sender", fields: [senderId], references: [id])
+  recipient User @relation("recipient", fields: [recipientId], references: [id])
+}
+
+/// Append-only log of sensitive actions. Never store PHI in `meta`.
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @db.Uuid
+  action     String   // e.g. PATIENT_VIEW, REVIEW_SIGN, REPORT_SEND
+  entityType String
+  entityId   String?
+  meta       Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+}
+
+/// Binary blobs (images, PDFs) for the "db" storage driver — used on hosts without a persistent disk.
+model StoredFile {
+  key       String   @id
+  data      Bytes
+  mimeType  String?
+  createdAt DateTime @default(now())
+}

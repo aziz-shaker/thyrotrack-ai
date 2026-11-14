@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>دليل مشروع ThyroTrack AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --navy:#0A3D57; --navy2:#0F4F6E; --cyan:#0E9FDC; --mist:#E4ECF1; --ink:#0A2D40; --soft:#4E6472; --muted:#8597A2; --line:#DCE7ED;
+          --ok:#15803D; --okbg:#DCFCE7; --no:#B91C1C; --nobg:#FEE2E2; --part:#92400E; --partbg:#FEF3C7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Readex Pro",Tahoma,sans-serif; color:var(--ink); font-size:10.2pt; line-height:1.7; }
+  .page { width:210mm; height:297mm; padding:17mm 16mm 16mm; position:relative; overflow:hidden; page-break-after:always; }
+  .page:last-child { page-break-after:auto; }
+  .nw { white-space:nowrap; direction:ltr; unicode-bidi:isolate; }
+  h1,h2,h3 { margin:0; color:var(--navy); line-height:1.3; }
+  h2 { font-size:16pt; font-weight:700; margin-bottom:3mm; }
+  h3 { font-size:11.5pt; font-weight:600; margin-bottom:1.5mm; }
+  p { margin:0 0 2.5mm; }
+  .lead { font-size:11pt; color:var(--soft); }
+  .foot { position:absolute; bottom:8mm; left:16mm; right:16mm; display:flex; justify-content:space-between; font-size:8pt; color:var(--muted); border-top:1px solid var(--line); padding-top:2mm; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:4mm; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:3.5mm; }
+  .card { border:1px solid var(--line); border-radius:3mm; padding:3.5mm 4mm; }
+  .card ul { margin:0; padding-inline-start:4.5mm; }
+  .card li { margin-bottom:.8mm; }
+  .note { background:var(--mist); border-radius:3mm; padding:3mm 4mm; font-size:9.3pt; color:var(--soft); }
+
+  /* Role cards */
+  .role { border:1px solid var(--line); border-radius:3mm; overflow:hidden; }
+  .role header { display:flex; align-items:center; gap:3mm; background:var(--navy); color:#fff; padding:2.5mm 4mm; }
+  .role header .ic { width:8mm; height:8mm; border-radius:50%; background:rgba(255,255,255,.15); display:grid; place-items:center; font-size:11pt; }
+  .role header b { font-size:11.5pt; } .role header span { font-size:8.5pt; opacity:.8; margin-inline-start:auto; }
+  .role .body { padding:2.5mm 4mm; font-size:9.3pt; line-height:1.6; }
+  .role .body ul { margin:0; padding-inline-start:4.5mm; }
+  .role .body li { margin-bottom:.6mm; }
+  .role .cant { margin-top:2mm; font-size:9pt; color:var(--no); }
+  .role.alt header { background:var(--cyan); }
+
+  /* Matrix */
+  table { width:100%; border-collapse:collapse; font-size:9.2pt; }
+  th, td { padding:1.8mm 2mm; border-bottom:1px solid var(--line); text-align:center; vertical-align:middle; }
+  th { background:var(--navy); color:#fff; font-weight:600; font-size:9pt; }
+  th:first-child, td:first-child { text-align:right; }
+  td:first-child { font-weight:500; color:var(--navy); }
+  tr:nth-child(even) td { background:#F7FAFB; }
+  .y, .n, .p { display:inline-block; border-radius:99px; padding:.3mm 2.2mm; font-size:8.4pt; font-weight:600; white-space:nowrap; }
+  .y { background:var(--okbg); color:var(--ok); } .n { background:var(--nobg); color:var(--no); } .p { background:var(--partbg); color:var(--part); }
+  .legend { display:flex; gap:5mm; font-size:8.6pt; color:var(--soft); margin:2mm 0 3mm; }
+
+  /* Feature tiles */
+  .tile { background:var(--mist); border-radius:3mm; padding:3mm 3.5mm; }
+  .tile b { display:block; color:var(--navy); font-size:10pt; margin-bottom:.8mm; }
+  .tile { font-size:9.2pt; color:var(--soft); line-height:1.6; }
+
+  /* Cover */
+  .cover { background:var(--navy); color:#fff; display:flex; flex-direction:column; padding:22mm 18mm; }
+  .cover h1 { color:#fff; font-size:32pt; font-weight:700; margin-top:30mm; line-height:1.25; }
+  .cover .sub { font-size:13pt; opacity:.88; margin-top:5mm; line-height:1.7; max-width:155mm; }
+  .cover .chips { display:flex; flex-wrap:wrap; gap:2.5mm; margin-top:10mm; }
+  .cover .chips span { border:1px solid rgba(255,255,255,.35); border-radius:99px; padding:1mm 4mm; font-size:10pt; }
+  .cover .bottom { margin-top:auto; display:flex; justify-content:space-between; align-items:flex-end; font-size:9.5pt; opacity:.85; }
+  .cover .lines { position:absolute; left:-20mm; bottom:40mm; width:120mm; opacity:.18; }
+  .cover .lines div { height:7mm; border:1.5px solid #2DB2E8; border-radius:99px; margin-bottom:4mm; }
+
+  .flow { display:grid; grid-template-columns:repeat(6,1fr); gap:2mm; }
+  .step { background:var(--mist); border-radius:2.5mm; padding:2.5mm 2mm; text-align:center; font-size:8.8pt; color:var(--soft); }
+  .step b { display:block; color:var(--navy); font-size:9.6pt; margin-bottom:.8mm; }
+  .step .n2 { display:inline-grid; place-items:center; width:6mm; height:6mm; border-radius:50%; background:var(--navy); color:#fff; font-size:8.4pt; margin-bottom:1mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. Cover ============ -->
+<section class="page cover">
+  <div class="lines" aria-hidden="true"><div style="width:60%"></div><div style="width:85%"></div><div style="width:100%"></div><div style="width:90%"></div><div style="width:70%"></div></div>
+  <div style="display:flex;align-items:center;gap:4mm">
+    <svg viewBox="0 0 48 40" width="50" height="42"><defs><clipPath id="t"><path d="M24 14c-3-7-12-10-17-6S2 22 6 29s12 8 15 3c2-3 2-9 3-11 1 2 1 8 3 11 3 5 11 4 15-3s3-17-2-21-14-1-16 6z"/></clipPath></defs><g clip-path="url(#t)">{{LOGO_LINES_LIGHT}}</g></svg>
+    <div><div style="font-weight:700;font-size:14pt">ثايرو تراك</div><div class="nw" style="font-weight:700;letter-spacing:1px">THYROTRACK <span style="color:#62C6EE">AI</span></div></div>
+  </div>
+  <h1>دليل المشروع<br>الوظائف والصلاحيات والمميزات</h1>
+  <p class="sub">شرح كامل لنظام ثايرو تراك: ماذا يفعل، ومن يستخدمه، وما المسموح لكل مستخدم: الطبيب، وأخصائي الأشعة، والمدير، وفني المعمل، والمريض.</p>
+  <div class="chips"><span>تحليل السونار بالذكاء الاصطناعي</span><span>تصنيف <span class="nw">ACR TI-RADS</span></span><span>مراجعة وتوقيع الطبيب</span><span>تقارير PDF</span><span>بوابة المريض</span><span>نموذج ثلاثي الأبعاد</span></div>
+  <div class="bottom"><span class="nw">thyrotrack-ai.vercel.app</span><span>مشروع عرض، وكل البيانات وهمية</span></div>
+</section>
+
+<!-- ============ 2. What it does ============ -->
+<section class="page">
+  <h2>النظام بيعمل إيه بشكل عام</h2>
+  <p class="lead">ثايرو تراك نظام ويب يساعد أطباء الغدد والأشعة في تشخيص ومتابعة عقيدات الغدة الدرقية. الطبيب يرفع صور السونار، فيحللها النظام ويحدد مكان العقدة ويقيسها ويقترح تصنيف خطورتها. بعدها يراجع الطبيب النتيجة، يعدلها أو يؤكدها، ثم يوقّع التقرير ويرسله للمريض.</p>
+
+  <div class="grid3" style="margin-top:4mm">
+    <div class="card"><h3>المشكلة</h3>تقييم عقيدات الغدة يدويًا يأخذ وقتًا، ومقارنة الفحوصات عبر الشهور صعبة، والمريض غالبًا لا يفهم تقريره.</div>
+    <div class="card"><h3>الحل</h3>تحليل آلي يقترح النتيجة ويشرح سببها، ومراجعة سريعة للطبيب، وتقرير جاهز، ومتابعة تلقائية لنمو العقدة.</div>
+    <div class="card"><h3>القاعدة الذهبية</h3>النظام <b>يساعد</b> الطبيب ولا يحل محله. لا تصل أي نتيجة للمريض قبل أن يراجعها الطبيب ويوقّعها.</div>
+  </div>
+
+  <h2 style="margin-top:7mm">أهم المميزات</h2>
+  <div class="grid3">
+    <div class="tile"><b>تحليل ذكي للسونار</b>يحدد العقدة ويرسم حدودها ويقيس أبعادها الثلاثة وحجمها.</div>
+    <div class="tile"><b>تصنيف <span class="nw">TI-RADS</span> تلقائي</b>يحسب نقاط كل صفة والفئة من TR1 إلى TR5 ويوضح السبب.</div>
+    <div class="tile"><b>توصية مقترحة</b>سحب عينة FNA أو متابعة حسب الفئة وحجم العقدة.</div>
+    <div class="tile"><b>عارض صور طبي</b>تكبير، وقياس بالمليمتر، وسطوع وتباين، وتحديد منطقة.</div>
+    <div class="tile"><b>مراجعة جنبًا إلى جنب</b>نتيجة الذكاء الاصطناعي بجانب قرار الطبيب في نفس الشاشة.</div>
+    <div class="tile"><b>توقيع رقمي</b>بعد التوقيع لا يمكن تعديل التقرير، وأي تغيير يُكتشف.</div>
+    <div class="tile"><b>تقرير PDF عربي</b>بالصورة وحدود العقدة والتصنيف والتوصية والتوقيع.</div>
+    <div class="tile"><b>إرسال آمن للمريض</b>داخل بوابته وبرابط مؤقت صالح لمدة 7 أيام.</div>
+    <div class="tile"><b>متابعة نمو العقدة</b>رسم بياني عبر الفحوصات وتنبيه عند النمو الملحوظ (معيار ATA).</div>
+    <div class="tile"><b>نموذج 3D للغدة</b>يوضح مكان العقدة بلون حسب درجة الخطورة.</div>
+    <div class="tile"><b>تحاليل ونتائج عينات</b>TSH و T3 و T4 وعينات FNA بتصنيف Bethesda.</div>
+    <div class="tile"><b>تنبيهات ورسائل</b>تنبيهات للحالات الخطرة، ورسائل بين المريض وطبيبه.</div>
+  </div>
+
+  <h2 style="margin-top:7mm">رحلة الحالة</h2>
+  <div class="flow">
+    <div class="step"><span class="n2">1</span><b>رفع الإشاعة</b>الطبيب يرفع صور المريض</div>
+    <div class="step"><span class="n2">2</span><b>التحليل</b>النظام يقترح النتيجة خلال ثوانٍ</div>
+    <div class="step"><span class="n2">3</span><b>المراجعة</b>الطبيب يؤكد أو يعدّل أو يرفض</div>
+    <div class="step"><span class="n2">4</span><b>التوقيع</b>التقرير يُعتمد ويُقفل</div>
+    <div class="step"><span class="n2">5</span><b>الإرسال</b>يصل للمريض في بوابته</div>
+    <div class="step"><span class="n2">6</span><b>المتابعة</b>موعد قادم ومقارنة بالفحص التالي</div>
+  </div>
+  <div class="foot"><span>دليل مشروع ThyroTrack AI</span><span>2</span></div>
+</section>
+
+<!-- ============ 3. Roles ============ -->
+<section class="page">
+  <h2>المستخدمين وصلاحيات كل واحد</h2>
+  <p class="lead" style="margin-bottom:3mm">كل مستخدم يدخل بحسابه ويرى شاشاته فقط. الصلاحيات تُفحص في الخادم مع كل طلب، وليس في الواجهة فقط.</p>
+  <div class="grid2">
+    <div class="role"><header><span class="ic">🩺</span><b>الطبيب</b><span>Doctor</span></header><div class="body"><ul>
+      <li>يرى <b>المرضى المسندين له فقط</b>، ومن ضمنهم أي صلاحية مؤقتة تُمنح له.</li>
+      <li>يضيف مرضى جدد (يُسندون له تلقائيًا) مع حساب في بوابة المريض، ويضيف فحص سونار ويرفع الصور ويشغّل التحليل.</li>
+      <li>يراجع نتيجة الذكاء الاصطناعي: يؤكدها أو يعدّل الصفات والأبعاد وحدود العقدة أو يرفضها.</li>
+      <li>يوقّع التقرير ويرسله للمريض، ويحمّله بصيغة PDF.</li>
+      <li>يحدد مواعيد المتابعة، ويدخل التحاليل، ويراسل مرضاه.</li>
+      <li>يتلقى تنبيهات الحالات الخطرة ونمو العقدة.</li>
+    </ul></div></div>
+
+    <div class="role"><header><span class="ic">🖥️</span><b>أخصائي الأشعة</b><span>Radiologist</span></header><div class="body"><ul>
+      <li>يرى المرضى المسندين له للمراجعة الإشعاعية فقط.</li>
+      <li>يرفع صور السونار ويشغّل التحليل.</li>
+      <li>يعدّل حدود العقدة على الصورة ويصحح الصفات الإشعاعية ويكتب ملاحظاته.</li>
+      <li>يعتمد التقرير ويرسله، ويحدد المتابعات ويراسل المرضى المسندين له.</li>
+      <li style="color:var(--soft)">في النسخة الحالية صلاحياته مثل الطبيب، والفرق في المرضى المسندين لكل منهما.</li>
+    </ul></div></div>
+
+    <div class="role alt"><header><span class="ic">⚙️</span><b>المدير</b><span>Admin</span></header><div class="body"><ul>
+      <li>يرى <b>كل المرضى</b> وكل الفحوصات والتقارير في النظام للإشراف.</li>
+      <li>يحمّل أي تقرير PDF.</li>
+      <li>كل ما يفعله يُسجَّل في سجل التدقيق مثل باقي المستخدمين.</li>
+    </ul>
+    <p class="cant">لا يرفع إشاعات، ولا يحلل، ولا يوقّع تقارير، ولا يراسل المرضى، لأن القرار الطبي للطبيب فقط.</p>
+    <p style="font-size:9pt;color:var(--soft);margin:1.5mm 0 0">شاشة إدارة المستخدمين لم تُبنَ بعد في الواجهة، والصلاحية موجودة في النظام.</p></div></div>
+
+    <div class="role alt"><header><span class="ic">🧪</span><b>فني المعمل</b><span>Lab Technician</span></header><div class="body"><ul>
+      <li>يرى ملفات المرضى لإدخال نتائج التحاليل.</li>
+      <li>يدخل نتائج TSH و Free T3 و Free T4 و Anti-TPO وغيرها، وعينات FNA بتصنيف Bethesda.</li>
+      <li>نتيجة عينة مشتبه بها (Bethesda V أو VI) تنبّه الأطباء المسؤولين تلقائيًا.</li>
+    </ul>
+    <p class="cant">لا يرفع إشاعات، ولا يراجع نتائج الذكاء الاصطناعي، ولا يوقّع، ولا يرسل تقارير، ولا يراسل المرضى.</p></div></div>
+
+    <div class="role" style="grid-column:span 2"><header><span class="ic">👤</span><b>المريض</b><span>Patient</span></header><div class="body">
+      <div class="grid2" style="gap:6mm"><ul>
+        <li>يرى <b>بياناته هو فقط</b>.</li>
+        <li>يرى حالته مشروحة بلغة بسيطة مع الخطوة التالية التي يوصي بها طبيبه.</li>
+        <li>يرى نموذجًا ثلاثي الأبعاد للغدة يوضح مكان العقدة ولونها حسب الخطورة.</li>
+        <li>يحمّل تقاريره بصيغة PDF ويرى صور الإشاعة وعليها مكان العقدة.</li>
+      </ul><ul>
+        <li>يرى مواعيد المتابعة ونتيجة تحليل TSH مشروحة.</li>
+        <li>يراسل طبيبه المعالج فقط.</li>
+        <li>تصله تنبيهات عند جاهزية التقرير أو تحديد موعد.</li>
+      </ul></div>
+      <p class="cant">لا يرى أي نتيجة للذكاء الاصطناعي قبل أن يراجعها الطبيب ويوقّعها ويرسلها، ولا يرى صور الفحوصات التي لم تُعتمد بعد.</p>
+    </div></div>
+  </div>
+  <div class="foot"><span>دليل مشروع ThyroTrack AI</span><span>3</span></div>
+</section>
+
+<!-- ============ 4. Permission matrix ============ -->
+<section class="page">
+  <h2>جدول مقارنة الصلاحيات</h2>
+  <div class="legend"><span><span class="y">✓</span> مسموح</span><span><span class="p">جزئي</span> مسموح بشروط</span><span><span class="n">✗</span> غير مسموح</span></div>
+  <table>
+    <tr><th style="width:52mm">العملية</th><th>الطبيب</th><th>أخصائي الأشعة</th><th>المدير</th><th>فني المعمل</th><th>المريض</th></tr>
+    <tr><td>رؤية ملفات المرضى</td><td><span class="p">مرضاه فقط</span></td><td><span class="p">المسندين له</span></td><td><span class="y">الكل</span></td><td><span class="y">الكل</span></td><td><span class="p">نفسه فقط</span></td></tr>
+    <tr><td>إضافة مريض جديد</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>إضافة فحص ورفع صور السونار</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>تشغيل تحليل الذكاء الاصطناعي</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>رؤية نتيجة الذكاء الاصطناعي قبل المراجعة</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="p">عرض فقط</span></td><td><span class="p">عرض فقط</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>تأكيد أو تعديل أو رفض النتيجة</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>تعديل حدود العقدة يدويًا</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>توقيع التقرير واعتماده</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>إرسال التقرير للمريض</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>تحميل التقرير PDF</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="p">بعد الإرسال</span></td></tr>
+    <tr><td>تحديد مواعيد المتابعة</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="p">يرى مواعيده</span></td></tr>
+    <tr><td>إدخال التحاليل ونتائج FNA</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td><td><span class="y">✓</span></td><td><span class="n">✗</span></td></tr>
+    <tr><td>المراسلة</td><td><span class="p">مع مرضاه</span></td><td><span class="p">مع مرضاه</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="p">مع طبيبه</span></td></tr>
+    <tr><td>النموذج ثلاثي الأبعاد</td><td><span class="y">تفصيلي</span></td><td><span class="y">تفصيلي</span></td><td><span class="y">تفصيلي</span></td><td><span class="y">تفصيلي</span></td><td><span class="p">مبسّط ومعتمد</span></td></tr>
+    <tr><td>التنبيهات</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+    <tr><td>إدارة المستخدمين</td><td><span class="n">✗</span></td><td><span class="n">✗</span></td><td><span class="p">مخطط</span></td><td><span class="n">✗</span></td><td><span class="n">✗</span></td></tr>
+  </table>
+
+  <h2 style="margin-top:7mm">كيف يحمي النظام هذه الصلاحيات</h2>
+  <div class="grid2">
+    <div class="card"><ul>
+      <li>الصلاحية تُفحص في <b>الخادم</b> مع كل طلب، فإخفاء زر في الواجهة ليس هو الحماية.</li>
+      <li>إذا حاول طبيب فتح ملف مريض غير مسند له يظهر له "غير موجود"، فلا يعرف حتى أن الملف موجود.</li>
+      <li>المريض لا يصل لصور فحص لم يُعتمد بعد، حتى لو عرف رابطها.</li>
+    </ul></div>
+    <div class="card"><ul>
+      <li>كل عملية حساسة تُسجَّل في <b>سجل التدقيق</b>: من فعلها ومتى وعلى أي سجل.</li>
+      <li>السجل يحفظ أرقامًا تعريفية فقط، وليس أسماء المرضى.</li>
+      <li>الصلاحيات المؤقتة للطبيب لها تاريخ انتهاء وتسقط تلقائيًا.</li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>دليل مشروع ThyroTrack AI</span><span>4</span></div>
+</section>
+
+<!-- ============ 5. Screens by role ============ -->
+<section class="page">
+  <h2>الشاشات المتاحة لكل مستخدم</h2>
+  <div class="grid2">
+    <div class="card"><h3>الطبيب وأخصائي الأشعة</h3><ul>
+      <li><b>اللوحة الرئيسية:</b> عدد المرضى، والحالات التي تنتظر المراجعة، والحالات عالية الخطورة، ومتابعات الشهر، ورسم بياني للإشاعات حسب الخطورة.</li>
+      <li><b>المرضى:</b> إضافة مريض جديد، وبحث بالاسم أو رقم الملف، وملف كل مريض بتبويبات: نظرة عامة، والإشاعات، والنموذج 3D، والسجل الزمني.</li>
+      <li><b>الإشاعات:</b> قائمة بفلاتر (تنتظر المراجعة، معتمدة، الكل)، ورفع إشاعة جديدة بالسحب والإفلات.</li>
+      <li><b>شاشة المراجعة:</b> العارض وأدواته، ونتيجة الذكاء الاصطناعي بجانب قرار الطبيب، والتوقيع.</li>
+      <li><b>التقارير:</b> كل التقارير المعتمدة، والتحميل، والإرسال للمريض.</li>
+      <li><b>المتابعات:</b> المواعيد القادمة والسابقة وتحديد موعد جديد.</li>
+      <li><b>الرسائل:</b> محادثات المرضى.</li>
+    </ul></div>
+    <div>
+      <div class="card"><h3>المريض</h3><ul>
+        <li><b>حالتي:</b> النتيجة بلغة بسيطة، والخطوة التالية، والنموذج 3D، والمواعيد، ونتيجة TSH، وتنبيهات الطبيب.</li>
+        <li><b>تقاريري:</b> كل تقرير مع صورة الإشاعة ومكان العقدة وزر تحميل PDF.</li>
+        <li><b>رسائل الطبيب:</b> محادثة مباشرة مع الطبيب المعالج.</li>
+      </ul></div>
+      <div class="card" style="margin-top:4mm"><h3>فني المعمل والمدير</h3><ul>
+        <li>نفس لوحة الطاقم الطبي، لكن بصلاحيات العرض فقط.</li>
+        <li>فني المعمل يرى نموذج إدخال التحاليل داخل ملف المريض.</li>
+      </ul></div>
+      <div class="card" style="margin-top:4mm"><h3>الزائر (دون تسجيل دخول)</h3><ul>
+        <li>الصفحة الرئيسية التعريفية.</li>
+        <li>حاسبة <span class="nw">TI-RADS</span> وحجم العقدة وتوصية FNA، وتفسير نتيجة TSH.</li>
+      </ul></div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:7mm">قواعد السلامة الطبية في النظام</h2>
+  <div class="grid2">
+    <div class="card"><ul>
+      <li>كل نتيجة للذكاء الاصطناعي مكتوب بجانبها أنها <b>مقترحة</b> وليست تشخيصًا.</li>
+      <li>لا يمكن إرسال تقرير للمريض قبل توقيع الطبيب.</li>
+      <li>النظام لا يعطي توصية علاجية نهائية، بل يقترح فقط: متابعة، أو FNA، أو تحاليل، أو مراجعة.</li>
+    </ul></div>
+    <div class="card"><ul>
+      <li>نتيجة الذكاء الاصطناعي الأصلية تُحفظ ولا تتغير، وتعديلات الطبيب تُحفظ بجانبها.</li>
+      <li>أي تعديل أو رفض يتطلب كتابة السبب، ويُسجَّل من عدّل ومتى.</li>
+      <li>تحذير واضح عند ضعف جودة الصورة أو غياب المعايرة، وتنبيه بأن الدقة قد تقل في التهاب هاشيموتو.</li>
+    </ul></div>
+  </div>
+  <div class="foot"><span>دليل مشروع ThyroTrack AI</span><span>5</span></div>
+</section>
+
+<!-- ============ 6. Tech + demo ============ -->
+<section class="page">
+  <h2>المشروع معمول بإيه (باختصار)</h2>
+  <div class="grid3">
+    <div class="tile"><b>الواجهة</b><span class="nw">Next.js 14 · React · TypeScript · Tailwind</span><br>عربي بالكامل ومتجاوب مع الموبايل.</div>
+    <div class="tile"><b>الخادم</b><span class="nw">Next.js API · Zod · Swagger</span><br>طبقة خدمات منظمة وتوثيق للـ API.</div>
+    <div class="tile"><b>قاعدة البيانات</b><span class="nw">PostgreSQL · Prisma</span><br>19 جدولًا مع حذف ناعم للسجلات الطبية.</div>
+    <div class="tile"><b>الذكاء الاصطناعي</b><span class="nw">Python · FastAPI · NumPy</span><br>خدمة مستقلة قابلة لاستبدال النموذج.</div>
+    <div class="tile"><b>ثلاثي الأبعاد والرسوم</b><span class="nw">Three.js · Recharts</span><br>نموذج الغدة ورسوم تطور العقدة.</div>
+    <div class="tile"><b>الأمان</b><span class="nw">NextAuth · bcrypt · AES-256</span><br>صلاحيات وتشفير وسجل تدقيق.</div>
+    <div class="tile"><b>التقارير</b><span class="nw">Playwright · Chromium</span><br>PDF عربي بالصورة والتوقيع.</div>
+    <div class="tile"><b>الاختبارات</b><span class="nw">Jest · Playwright · pytest</span><br>57 اختبارًا ناجحًا.</div>
+    <div class="tile"><b>النشر</b><span class="nw">Vercel · Neon · Docker</span><br>منشور مجانًا ويعمل الآن.</div>
+  </div>
+
+  <h2 style="margin-top:8mm">جرّب كل دور بنفسك</h2>
+  <p>كل الحسابات كلمة مرورها <span class="nw"><b>Demo@1234</b></span>، وفي صفحة الدخول أزرار تملأ البيانات تلقائيًا.</p>
+  <table>
+    <tr><th style="width:38mm">الدور</th><th>البريد الإلكتروني</th><th>ماذا تجرب</th></tr>
+    <tr><td>طبيب</td><td class="nw">dr.sara@thyrotrack.demo</td><td style="text-align:right">مراجعة إشاعة سلمى، وتعديل صفة، والتوقيع، والإرسال</td></tr>
+    <tr><td>أخصائي أشعة</td><td class="nw">dr.omar@thyrotrack.demo</td><td style="text-align:right">تعديل حدود العقدة على الصورة</td></tr>
+    <tr><td>طبيب جراحة</td><td class="nw">dr.khaled@thyrotrack.demo</td><td style="text-align:right">لاحظ أنه يرى مرضى مختلفين عن د. سارة</td></tr>
+    <tr><td>فني معمل</td><td class="nw">lab@thyrotrack.demo</td><td style="text-align:right">إدخال تحليل TSH أو نتيجة FNA</td></tr>
+    <tr><td>مدير</td><td class="nw">admin@thyrotrack.demo</td><td style="text-align:right">رؤية كل المرضى دون صلاحية التوقيع</td></tr>
+    <tr><td>مريض</td><td class="nw">patient1@thyrotrack.demo</td><td style="text-align:right">الحالة المبسطة، والنموذج 3D، والتقرير، والرسائل</td></tr>
+  </table>
+
+  <div class="note" style="margin-top:7mm">
+    <b>الموقع:</b> <span class="nw">https://thyrotrack-ai.vercel.app</span> &nbsp;·&nbsp; <b>توثيق الـ API:</b> <span class="nw">/api-docs</span><br>
+    مشروع عرض، وكل البيانات وهمية وصور السونار اصطناعية. ليس جهازًا طبيًا معتمدًا، والقرار النهائي دائمًا للطبيب المعالج.
+  </div>
+  <div class="foot"><span>دليل مشروع ThyroTrack AI</span><span>6</span></div>
+</section>
+
+</body>
+</html>

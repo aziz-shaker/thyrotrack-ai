@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>ThyroTrack AI — نظرة عامة على المشروع</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  :root { --navy:#0A3D57; --navy2:#0F4F6E; --cyan:#0E9FDC; --mist:#E4ECF1; --ink:#0A2D40; --soft:#4E6472; --muted:#8597A2; --line:#DCE7ED; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Readex Pro",Tahoma,sans-serif; color:var(--ink); font-size:10.2pt; line-height:1.7; }
+  .page { width:210mm; height:297mm; padding:18mm 17mm 16mm; position:relative; overflow:hidden; page-break-after:always; }
+  .page:last-child { page-break-after:auto; }
+  .ltr { direction:ltr; unicode-bidi:isolate; }
+  .nw { white-space:nowrap; direction:ltr; unicode-bidi:isolate; }
+  .crop { height:88mm; object-fit:cover; object-position:top; }
+  h1,h2,h3 { margin:0; color:var(--navy); line-height:1.3; }
+  h2 { font-size:17pt; font-weight:700; margin-bottom:3mm; }
+  h3 { font-size:11.5pt; font-weight:600; margin-bottom:1.5mm; }
+  p { margin:0 0 2.5mm; }
+  .lead { font-size:11.5pt; color:var(--soft); }
+  .foot { position:absolute; bottom:8mm; left:17mm; right:17mm; display:flex; justify-content:space-between; font-size:8pt; color:var(--muted); border-top:1px solid var(--line); padding-top:2mm; }
+  .shot { width:100%; border:1px solid var(--line); border-radius:3mm; display:block; }
+  .cap { font-size:8.5pt; color:var(--muted); margin-top:1.5mm; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+  .card { border:1px solid var(--line); border-radius:3mm; padding:4mm 4.5mm; }
+  .card ul { margin:0; padding-inline-start:4.5mm; }
+  .card li { margin-bottom:1mm; }
+  table { width:100%; border-collapse:collapse; font-size:9.6pt; }
+  th, td { text-align:right; padding:2mm 2.5mm; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:var(--mist); color:var(--navy); font-weight:600; }
+  td:first-child { font-weight:600; color:var(--navy); white-space:nowrap; }
+  .tag { display:inline-block; border:1px solid var(--line); border-radius:99px; padding:0 2.5mm; margin:0 0 1mm 1mm; font-size:8.6pt; direction:ltr; }
+  .note { background:var(--mist); border-radius:3mm; padding:3mm 4mm; font-size:9.4pt; color:var(--soft); }
+
+  /* Cover */
+  .cover { background:linear-gradient(160deg,#E9F0F4 0%,#D6E2E9 100%); padding:0; display:flex; flex-direction:column; }
+  .cover .top { padding:22mm 18mm 0; }
+  .brand { display:flex; align-items:center; gap:4mm; }
+  .cover h1 { font-size:34pt; font-weight:700; margin-top:14mm; letter-spacing:-.3px; }
+  .cover .sub { font-size:14pt; color:var(--navy2); margin-top:3mm; max-width:150mm; line-height:1.6; }
+  .live { display:inline-flex; gap:3mm; align-items:center; margin-top:8mm; background:var(--navy); color:#fff; border-radius:2mm; padding:2.5mm 5mm; font-weight:600; font-size:11pt; }
+  .cover .shotwrap { margin-top:auto; padding:0 14mm; height:108mm; overflow:hidden; }
+  .cover .shotwrap img { border-radius:3mm 3mm 0 0; border-bottom:0; }
+  .facts { display:flex; gap:9mm; margin-top:9mm; }
+  .facts div b { display:block; font-size:16pt; color:var(--cyan); }
+  .facts div { font-size:9pt; color:var(--soft); }
+
+  /* Flow */
+  .flow { display:grid; grid-template-columns:repeat(6,1fr); gap:2mm; margin-top:2mm; }
+  .step { background:var(--mist); border-radius:2.5mm; padding:3mm 2.5mm; text-align:center; font-size:9pt; }
+  .step b { display:block; color:var(--navy); font-size:9.8pt; margin-bottom:1mm; }
+  .step span.n { display:inline-grid; place-items:center; width:6mm; height:6mm; border-radius:50%; background:var(--navy); color:#fff; font-size:8.5pt; margin-bottom:1.5mm; }
+
+  /* Architecture diagram */
+  .arch { display:grid; grid-template-columns:1fr 14mm 1.25fr 14mm 1fr; align-items:center; margin:2mm 0 4mm; }
+  .box { border:1.5px solid var(--navy); border-radius:3mm; padding:3mm; text-align:center; font-size:9pt; background:#fff; }
+  .box b { display:block; color:var(--navy); font-size:10pt; }
+  .box.main { background:var(--navy); color:#fff; } .box.main b { color:#fff; }
+  .arrow { text-align:center; color:var(--cyan); font-size:16pt; }
+  .stack { display:flex; flex-direction:column; gap:3mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. Cover ============ -->
+<section class="page cover">
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 48 40" width="54" height="45"><defs><clipPath id="t"><path d="M24 14c-3-7-12-10-17-6S2 22 6 29s12 8 15 3c2-3 2-9 3-11 1 2 1 8 3 11 3 5 11 4 15-3s3-17-2-21-14-1-16 6z"/></clipPath></defs><g clip-path="url(#t)">{{LOGO_LINES}}</g></svg>
+      <div><div style="font-weight:700;font-size:15pt;color:var(--navy)">ثايرو تراك</div><div class="ltr" style="font-weight:700;letter-spacing:1px;color:var(--navy)">THYROTRACK <span style="color:var(--cyan)">AI</span></div></div>
+    </div>
+    <h1>نظام ذكي لتشخيص ومتابعة<br>عقيدات الغدة الدرقية</h1>
+    <p class="sub">يحلل صور السونار، ويحدد مكان العقدة، ويقترح تصنيف <span class="nw">ACR TI-RADS</span>، ثم يراجع الطبيب النتيجة ويعتمدها قبل أن تصل للمريض.</p>
+    <div class="live"><span>الموقع يعمل الآن:</span> <span class="ltr">thyrotrack-ai.vercel.app</span></div>
+    <div class="facts">
+      <div><b>3</b>أجزاء: موقع، وخدمة ذكاء اصطناعي، وقاعدة بيانات</div>
+      <div><b>5</b>أدوار مستخدمين بصلاحيات مختلفة</div>
+      <div><b>57</b>اختبارًا آليًا ناجحًا</div>
+    </div>
+  </div>
+  <div class="shotwrap"><img class="shot" src="{{IMG_landing}}" alt=""></div>
+</section>
+
+<!-- ============ 2. Idea + what it does ============ -->
+<section class="page">
+  <h2>الفكرة</h2>
+  <p class="lead">عقيدات الغدة الدرقية شائعة جدًا، وقرار متابعتها أو سحب عينة منها (FNA) يعتمد على تقييم صفات العقدة في السونار وفق نظام <span class="nw">ACR TI-RADS</span>. التقييم اليدوي يأخذ وقتًا، ومقارنة الفحوصات عبر الزمن صعبة، والمريض غالبًا لا يفهم تقريره.</p>
+  <p>ثايرو تراك أداة <b>مساعدة لاتخاذ القرار</b> وليست بديلًا عن الطبيب. تقترح النتيجة وتشرح سببها، وتحفظ نسخة نتيجة الذكاء الاصطناعي الأصلية بجانب قرار الطبيب، ولا يُرسل أي تقرير للمريض قبل توقيع الطبيب عليه.</p>
+
+  <h2 style="margin-top:6mm">ماذا يقدّم لكل مستخدم</h2>
+  <div class="grid2">
+    <div class="card"><h3>الطبيب وأخصائي الأشعة</h3><ul>
+      <li>لوحة تعرض الحالات التي تنتظر المراجعة والحالات عالية الخطورة والمواعيد القادمة.</li>
+      <li>عارض صور بأدوات التكبير والقياس بالمليمتر وضبط السطوع والتباين.</li>
+      <li>نتيجة الذكاء الاصطناعي بجانب قراره، مع إمكانية تعديل أي صفة أو رسم حدود العقدة بيده.</li>
+      <li>توقيع إلكتروني للتقرير، وإرساله للمريض برابط آمن.</li>
+    </ul></div>
+    <div class="card"><h3>المريض</h3><ul>
+      <li>حالته مشروحة بلغة بسيطة، دون مصطلحات غير مفهومة.</li>
+      <li>نموذج ثلاثي الأبعاد للغدة يوضح مكان العقدة بلون حسب درجة الخطورة.</li>
+      <li>تقاريره بصيغة PDF، ومواعيد المتابعة، ونتيجة تحليل TSH مشروحة.</li>
+      <li>رسائل مباشرة مع طبيبه.</li>
+    </ul></div>
+    <div class="card"><h3>فني المعمل</h3><ul>
+      <li>إدخال نتائج TSH و T3 و T4 وعينات FNA بتصنيف Bethesda.</li>
+      <li>تنبيه تلقائي للأطباء عند نتيجة عينة مشتبه بها (Bethesda V أو VI).</li>
+    </ul></div>
+    <div class="card"><h3>الزائر</h3><ul>
+      <li>صفحة تعريفية بالنظام.</li>
+      <li>حاسبة <span class="nw">TI-RADS</span> تفاعلية تحسب التصنيف وحجم العقدة وتوصية FNA فورًا.</li>
+    </ul></div>
+  </div>
+
+  <h2 style="margin-top:6mm">رحلة الحالة داخل النظام</h2>
+  <div class="flow">
+    <div class="step"><span class="n">1</span><b>رفع الإشاعة</b>صور DICOM أو PNG أو JPG بمقطعين</div>
+    <div class="step"><span class="n">2</span><b>تحليل آلي</b>تحديد العقدة وقياسها وتصنيفها</div>
+    <div class="step"><span class="n">3</span><b>مراجعة الطبيب</b>تأكيد أو تعديل أو رفض مع ذكر السبب</div>
+    <div class="step"><span class="n">4</span><b>توقيع</b>بصمة <span class="nw">SHA-256</span> تمنع أي تعديل لاحق</div>
+    <div class="step"><span class="n">5</span><b>تقرير PDF</b>يُرسل للمريض برابط صالح 7 أيام</div>
+    <div class="step"><span class="n">6</span><b>متابعة</b>مقارنة الفحوصات وتنبيه عند نمو العقدة</div>
+  </div>
+  <div class="foot"><span>ThyroTrack AI</span><span>2</span></div>
+</section>
+
+<!-- ============ 3. AI ============ -->
+<section class="page">
+  <h2>الذكاء الاصطناعي: كيف يحلل الصورة</h2>
+  <p>خدمة مستقلة مكتوبة بلغة Python. كل مرحلة فيها قابلة للاستبدال من الإعدادات دون تغيير باقي النظام:</p>
+  <table>
+    <tr><th style="width:30mm">المرحلة</th><th>ماذا تفعل</th></tr>
+    <tr><td>تجهيز الصورة</td><td>تحويل DICOM إلى صورة عادية مع حذف بيانات المريض منها، وقراءة المعايرة (مليمتر لكل بكسل)، وتقييم جودة الصورة.</td></tr>
+    <tr><td>كشف العقدة</td><td>البحث عن المناطق الأغمق من النسيج المحيط بها، واستبعاد ظلال القصبة الهوائية وحواف الصورة.</td></tr>
+    <tr><td>رسم الحدود</td><td>توسيع المنطقة حتى حافتها الحقيقية، ثم رسم حدودها كمضلع على الصورة.</td></tr>
+    <tr><td>استخراج الصفات</td><td>التركيب، ودرجة الصدى، والشكل، والحواف، والبؤر الصدوية (التكلسات) من خصائص الصورة نفسها.</td></tr>
+    <tr><td>التصنيف</td><td>محرك قواعد <span class="nw">ACR TI-RADS 2017</span>: نقاط كل صفة، ثم الفئة من TR1 إلى TR5، ثم توصية FNA أو المتابعة حسب حجم العقدة.</td></tr>
+    <tr><td>الموقع والقياس</td><td>الفص (أيمن أو أيسر أو البرزخ) والثلث (علوي أو أوسط أو سفلي)، والأبعاد الثلاثة، والحجم بمعادلة الشكل البيضاوي.</td></tr>
+  </table>
+  <p style="margin-top:3mm">النظام يُصدر <b>تحذيرات</b> عند ضعف جودة الصورة، أو غياب المعايرة، أو غياب المقطع الطولي، ويحدد نسبة ثقته في كل نتيجة.</p>
+  <div class="note"><b>بصراحة:</b> النسخة الحالية خوارزمية رؤية حاسوبية كلاسيكية دون نموذج مدرّب. تكتشف العقد منخفضة الصدى والكيسية بدقة جيدة على الصور الاختبارية، لكنها لا تكتشف العقد متساوية أو عالية الصدى ولا التكلسات الكبيرة. البنية جاهزة لإضافة نموذج مدرّب (مثل U-Net باستخدام MONAI) على بيانات مفتوحة مثل TN3K و DDTI.</div>
+  <div style="margin-top:5mm"><img class="shot crop" style="height:84mm" src="{{IMG_review}}" alt=""><p class="cap">شاشة مراجعة الطبيب: العارض وحدود العقدة على اليسار، ونتيجة الذكاء الاصطناعي بجانب قرار الطبيب على اليمين.</p></div>
+  <div class="foot"><span>ThyroTrack AI</span><span>3</span></div>
+</section>
+
+<!-- ============ 4. Tech ============ -->
+<section class="page">
+  <h2>المشروع معمول بإيه</h2>
+  <table>
+    <tr><th style="width:34mm">الجزء</th><th>التقنيات</th></tr>
+    <tr><td>واجهة المستخدم</td><td><span class="tag">Next.js 14</span><span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Tailwind CSS</span> دعم كامل للعربية والكتابة من اليمين لليسار، وتصميم متجاوب مع الموبايل.</td></tr>
+    <tr><td>الخادم و API</td><td><span class="tag">Next.js Route Handlers</span><span class="tag">REST</span><span class="tag">Zod</span> طبقة خدمات منفصلة عن المسارات، وتوثيق Swagger / OpenAPI.</td></tr>
+    <tr><td>قاعدة البيانات</td><td><span class="tag">PostgreSQL 16</span><span class="tag">Prisma ORM</span> 19 جدولًا بعلاقات كاملة من المريض حتى التقرير، مع حذف ناعم للسجلات الطبية.</td></tr>
+    <tr><td>الذكاء الاصطناعي</td><td><span class="tag">Python 3.12</span><span class="tag">FastAPI</span><span class="tag">NumPy</span><span class="tag">Pillow</span><span class="tag">pydicom</span> خدمة مستقلة، بواجهة جاهزة لنماذج <span class="nw">PyTorch / MONAI</span>.</td></tr>
+    <tr><td>تسجيل الدخول</td><td><span class="tag">NextAuth</span><span class="tag">JWT</span><span class="tag">bcrypt</span> صلاحيات حسب الدور وعلى مستوى كل مريض.</td></tr>
+    <tr><td>النموذج ثلاثي الأبعاد</td><td><span class="tag">Three.js</span><span class="tag">React Three Fiber</span> غدة تفاعلية تُدار وتُكبَّر، والعقدة ملونة حسب الخطورة.</td></tr>
+    <tr><td>الرسوم البيانية</td><td><span class="tag">Recharts</span> تطور حجم العقدة، والإشاعات حسب الخطورة.</td></tr>
+    <tr><td>تقارير PDF</td><td><span class="tag">Playwright</span><span class="tag">Chromium</span> تقرير عربي بالصورة والتوقيع.</td></tr>
+    <tr><td>الاختبارات</td><td><span class="tag">Jest</span><span class="tag">Playwright</span><span class="tag">pytest</span></td></tr>
+    <tr><td>التشغيل والنشر</td><td><span class="tag">Docker</span><span class="tag">Docker Compose</span><span class="tag">Vercel</span><span class="tag">Neon</span><span class="tag">Caddy</span></td></tr>
+  </table>
+
+  <h2 style="margin-top:7mm">المعمارية</h2>
+  <div class="arch">
+    <div class="box"><b>المتصفح</b>الطبيب، المريض، فني المعمل</div>
+    <div class="arrow">⟵⟶</div>
+    <div class="box main"><b>تطبيق Next.js</b>الواجهة، والـ API، والصلاحيات، وسجل التدقيق، والتحقق من المدخلات، وتوليد PDF</div>
+    <div class="arrow">⟵⟶</div>
+    <div class="stack">
+      <div class="box"><b>خدمة الذكاء الاصطناعي</b><span class="ltr">FastAPI</span></div>
+      <div class="box"><b>قاعدة البيانات</b><span class="ltr">PostgreSQL</span> + الصور</div>
+    </div>
+  </div>
+  <p><b>مسار البيانات:</b> مريض ← فحص سونار ← صور ← نتيجة الذكاء الاصطناعي (تُحفظ ولا تتغير) ← العقدة ← مراجعة الطبيب (موقّعة) ← تقرير.</p>
+  <p>كل عقدة لها <b>هوية ثابتة</b> عبر الفحوصات، فيستطيع النظام مقارنتها ورصد نموها وفق معيار ATA (زيادة 20% في بُعدين بحد أدنى 2 مم، أو زيادة الحجم أكثر من 50%).</p>
+  <div class="foot"><span>ThyroTrack AI</span><span>4</span></div>
+</section>
+
+<!-- ============ 5. Security, quality, deployment ============ -->
+<section class="page">
+  <div class="grid2" style="grid-template-columns:1.15fr 1fr">
+    <div>
+      <h2>الأمان والخصوصية</h2>
+      <div class="card"><ul>
+        <li>كلمات المرور مشفّرة (bcrypt)، وعدد محاولات الدخول محدود.</li>
+        <li>الطبيب يرى مرضاه فقط، والمريض يرى تقاريره المعتمدة فقط.</li>
+        <li>رقم هاتف المريض مشفّر داخل قاعدة البيانات (<span class="nw">AES-256-GCM</span>).</li>
+        <li>نوع الملف المرفوع يُفحص من محتواه وليس من اسمه، مع حد للحجم والعدد.</li>
+        <li>سجل تدقيق لكل عملية حساسة: الدخول، فتح ملف مريض، التحليل، التوقيع، الإرسال، التحميل.</li>
+        <li>التقرير الموقّع لا يمكن تعديله، وأي تغيير يكسر بصمته الرقمية.</li>
+        <li>روابط مشاركة التقرير غير قابلة للتخمين وتنتهي صلاحيتها بعد 7 أيام.</li>
+        <li>اتصال مشفّر (HTTPS) وترويسات أمان على كل الصفحات.</li>
+      </ul></div>
+
+      <h2 style="margin-top:6mm">الجودة والاختبارات</h2>
+      <table>
+        <tr><th>النوع</th><th>العدد</th><th>ماذا يغطي</th></tr>
+        <tr><td>Jest</td><td>28</td><td>قواعد TI-RADS، والتشفير، وفحص الملفات، والتحقق من المدخلات</td></tr>
+        <tr><td>pytest</td><td>24</td><td>خوارزمية التحليل على صور سونار اصطناعية</td></tr>
+        <tr><td>Playwright</td><td>5</td><td>تجربة المستخدم كاملة: الدخول، الصلاحيات، المراجعة، التوقيع، الإرسال</td></tr>
+      </table>
+      <p class="cap">كل الاختبارات ناجحة، واختبارات المتصفح جرى تشغيلها أيضًا على الموقع المنشور نفسه.</p>
+
+    </div>
+    <div>
+      <img class="shot" src="{{IMG_patient}}" alt="">
+      <p class="cap">بوابة المريض: الحالة بلغة بسيطة، ونموذج ثلاثي الأبعاد للغدة، والمواعيد، ونتيجة التحليل.</p>
+    </div>
+  </div>
+  <div class="foot"><span>ThyroTrack AI</span><span>5</span></div>
+</section>
+
+<!-- ============ 6. Limits, next, links ============ -->
+<section class="page">
+  <h2>لوحة الطبيب</h2>
+  <img class="shot crop" src="{{IMG_dashboard}}" alt="">
+  <p class="cap">الحالات التي تنتظر المراجعة، والحالات عالية الخطورة، والمواعيد القادمة، والإشاعات حسب الخطورة.</p>
+
+  <h2 style="margin-top:6mm">النشر</h2>
+  <p>الموقع وخدمة الذكاء الاصطناعي منشوران على <b>Vercel</b>، وقاعدة البيانات على <b>Neon</b> في فرانكفورت، والصور محفوظة داخل قاعدة البيانات نفسها فلا تضيع عند إعادة التشغيل. ويوجد أيضًا إعداد Docker كامل لتشغيل النظام على أي خادم، مع شهادة HTTPS تلقائية عبر Caddy.</p>
+  <h2 style="margin-top:6mm">جرّب بنفسك</h2>
+  <table>
+    <tr><td>الموقع</td><td class="ltr">https://thyrotrack-ai.vercel.app</td></tr>
+    <tr><td>توثيق الـ API</td><td class="ltr">https://thyrotrack-ai.vercel.app/api-docs</td></tr>
+    <tr><td>خدمة الذكاء الاصطناعي</td><td class="ltr">https://thyrotrack-ai-service.vercel.app/docs</td></tr>
+    <tr><td>حسابات تجريبية</td><td>أزرار جاهزة في صفحة الدخول، وكلمة المرور لكل الحسابات <span class="ltr"><b>Demo@1234</b></span></td></tr>
+  </table>
+  <div class="foot"><span>ThyroTrack AI</span><span>6</span></div>
+</section>
+
+<!-- ============ 7. Limits + next steps ============ -->
+<section class="page">
+  <div class="grid2" >
+    <div>
+      <h2>حدود النظام</h2>
+      <div class="card"><ul>
+        <li>مشروع عرض، وكل البيانات وهمية وصور السونار اصطناعية.</li>
+        <li>ليس جهازًا طبيًا معتمدًا. الاستخدام الفعلي يحتاج موافقة جهة تنظيمية مثل هيئة الدواء المصرية أو FDA.</li>
+        <li>الخوارزمية الحالية لا تكتشف كل أنواع العقد، كما هو موضح في صفحة الذكاء الاصطناعي.</li>
+        <li>على الاستضافة المجانية: حد رفع الصورة حوالي 4.5 ميجابايت.</li>
+      </ul></div>
+    </div>
+    <div>
+      <h2>الخطوات القادمة</h2>
+      <div class="card"><ul>
+        <li>تدريب نموذج حقيقي لتحديد حدود العقدة على بيانات مفتوحة.</li>
+        <li>شاشة إدارة المستخدمين للمدير.</li>
+        <li>إرسال التقارير بالبريد والرسائل النصية، وتحقق ثنائي عند الدخول.</li>
+        <li>الربط مع أنظمة الأشعة في المستشفيات (PACS).</li>
+        <li>دعم أنظمة تصنيف إضافية مثل <span class="nw">EU-TIRADS</span>.</li>
+      </ul></div>
+    </div>
+  </div>
+
+
+  <div class="note" style="margin-top:8mm">ثايرو تراك أداة مساعدة لاتخاذ القرار. النتائج المقترحة من الذكاء الاصطناعي ليست تشخيصًا، والقرار النهائي دائمًا للطبيب المعالج.</div>
+  <div class="foot"><span>ThyroTrack AI</span><span>7</span></div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Automatic HTTPS (Let's Encrypt). DOMAIN is e.g. 141-147-12-34.sslip.io
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:3000
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+}

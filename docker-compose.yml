@@ -1,0 +1,70 @@
+# ThyroTrack AI
+#   Database only (local development):  docker compose up -d
+#   Full stack (server / containers):   docker compose --profile full up -d --build
+# Only Caddy is reachable from outside; everything else is bound to localhost / the internal network.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: thyrotrack-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-thyro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-thyro_dev_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-thyrotrack}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-thyro}"]
+      interval: 5s
+      retries: 10
+
+  ai:
+    profiles: ["full"]
+    build: ./ai-service
+    container_name: thyrotrack-ai
+    restart: unless-stopped
+    environment:
+      SERVICE_TOKEN: ${AI_SERVICE_TOKEN:-}
+      SEGMENTER_BACKEND: ${SEGMENTER_BACKEND:-classical}
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  web:
+    profiles: ["full"]
+    build: ./web
+    container_name: thyrotrack-web
+    restart: unless-stopped
+    env_file: ./web/.env # NEXTAUTH_SECRET, FIELD_ENCRYPTION_KEY, NEXTAUTH_URL (values below override the rest)
+    depends_on:
+      postgres: { condition: service_healthy }
+      ai: { condition: service_started }
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-thyro}:${POSTGRES_PASSWORD:-thyro_dev_pw}@postgres:5432/${POSTGRES_DB:-thyrotrack}
+      AI_SERVICE_URL: http://ai:8000
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:-}
+      STORAGE_LOCAL_DIR: /data/storage
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./storage:/data/storage
+
+  caddy:
+    profiles: ["full"]
+    image: caddy:2.8.4-alpine
+    container_name: thyrotrack-proxy
+    restart: unless-stopped
+    depends_on: [web]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  pgdata:
+  caddy_data:
